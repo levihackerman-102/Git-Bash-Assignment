@@ -1,0 +1,91 @@
+0) Initialized a local repo and cloned the exercise to begin
+
+git clone https://gitexercises.fracz.com/git/exercises.git
+cd exercises
+git config user.name "Anshul Singh"
+git config user.email "anshulspidy@gmail.com"
+./configure.sh
+git start
+
+1) Push the first commit that's created
+
+git start master
+git verify
+
+2) Commit A.txt only
+
+git add A.txt
+# only added A.txt to the staging area
+git commit -m 'Commited A.txt'
+git verify
+
+3) Cleared tbe staging area and then added B.txt only
+
+git reset
+git add B.txt
+git commit -m 'Commited B.txt'
+git verify
+
+4) Created a .gitignore file manually and added all the mentioned file types to it (file attached in Github repo)
+
+5) Checked current branch, made sure it's chase-branch and merged escaped to it
+
+git status
+git merge escaped
+git verify
+
+6) Merge them, resolve the conflicts manually and then commit 
+
+git merge another-piece-of-work
+# resolved conflicts manually in the .txt file
+git add equation.txt
+git commit --no-edit
+git verify
+
+7) Stash the curret workspace, fix the bug, pop the workspace from the stack and commit 
+
+git stash
+# fix the bug line in the .txt file manually
+git commit -am "Fixed the bug"
+git stash pop
+# add the required line in bug.txt manually
+git commit -am "Finished the work"
+git verify
+
+8) We need to put the commit C in line with the commit B so that it becomes part of that branch
+
+git rebase hot-bugfix
+git verify
+
+9) We use remove command to remove the said file from the staging area
+
+git rm ignored.txt
+git commit -am "Removed ignored.txt"
+git verify
+
+10) Use mv command to rename file
+
+git mv File.txt file.txt
+git commit -am "renamed File.txt to file.txt"
+git verify
+
+11) Fix the typo manually and then use amend to change it in the commit too
+
+# fix typo manually in file.txt
+git commit -a --amend
+git verify
+
+12) Change author's and commit's date using amend
+
+GIT_COMMITTER_DATE="Mon Feb 16 9:40 1987 +0200" git commit --amend --no-edit --date "Mon Feb 16 9:40 2015 +0200"
+git verify
+
+13) Use interactive rebase to go 2 commits back and edit the file as required 
+
+git rebase -i HEAD~2
+# perform edit in nano
+# edit file.txt manually
+git add file.txt
+git rebase --continue
+git verify
+

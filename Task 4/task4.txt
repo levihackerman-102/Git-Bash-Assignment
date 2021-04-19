@@ -1,0 +1,286 @@
+L0->L1) Connect using ssh to port 2220 as bandit0 using the password bandit0. Then find the password for L1 in this directory.
+
+ssh bandit0@bandit.labs.overthewire.org -p 2220
+# view all files present using ls
+cat readme
+# copy password of L1
+exit
+
+L1->L2) Access the file - from home directory to find pw of L2 
+
+ssh bandit1@bandit.labs.overthewire.org -p 2220
+# view all files present using ls
+cat ./-
+# copy password of L2
+exit
+
+L2->L3) The required filename has spaces so we use \ in cat 
+
+ssh bandit2@bandit.labs.overthewire.org -p 2220
+# view all files present using ls
+cat spaces\ in\ this\ filename
+# copy password of L3
+exit
+
+L3->L4) Use ls -la to view hidden files
+
+ssh bandit3@bandit.labs.overthewire.org -p 2220
+ls -la
+cat .hidden
+# copy password of L4
+exit
+
+L4->L5) View hidden files in inhere/ and find the required one 
+
+ssh bandit4@bandit.labs.overthewire.org -p 2220
+cd inhere/
+# view all files present using ls -la
+find . -type f grep ASCII
+# by checking we find that file07 is the required one
+# copy password of L5
+exit
+
+L5->L6) Use more parameters in find command
+
+ssh bandit5@bandit.labs.overthewire.org -p 2220
+cd inhere/
+ls -la
+find . -type f -readable ! -executable -size 1033c
+# we find that .file2 is the required one
+cat ./maybehere07/.file2
+# copy password of L6
+exit
+
+L6->L7) Use even more parameters for find command across the server
+
+ssh bandit6@bandit.labs.overthewire.org -p 2220
+find / -user bandit7 -group bandit6 -size 33c 2>/dev/null
+# find the required file
+cat /var/lib/dpkg/info/bandit7.password
+# copy password of L7
+exit
+
+L7->L8) Use grep with cat
+
+ssh bandit7@bandit.labs.overthewire.org -p 2220
+cat data.txt | grep "millionth" 
+# find password along with millionth
+# copy password of L8
+exit
+
+L8->L9) Sort by uniqueness using -u
+
+ssh bandit8@bandit.labs.overthewire.org -p 2220
+cat data.txt | sort | uniq -u
+# copy password of L9
+exit
+
+L9->L10) Use strings and grep "==="
+
+ssh bandit9@bandit.labs.overthewire.org -p 2220
+strings data.txt | grep "==="
+# copy password of L10
+exit
+
+L10->L11) Use base64 --decode 
+
+ssh bandit10@bandit.labs.overthewire.org -p 2220
+cat data.txt | base64 --decode
+# copy password of L11
+exit
+
+L11->L12) Use translate parameter with rot13 algo in cat
+
+ssh bandit11@bandit.labs.overthewire.org -p 2220
+cat data.txt | tr '[A-Za-z]' '[N-ZA-Mn-za-m]'
+# copy password of L12
+exit
+
+L12->L13) Used gzip,bzip2 and tar decompressions and file command to find which one to use
+
+ssh bandit12@bandit.labs.overthewire.org -p 2220
+mkdir /tmp/lv12
+cp data.txt /tmp/lv12
+cd /tmp/lv12
+file data.txt
+# turns out to be ASCII but is still unreadable as it's a hex dump
+# use xxd to reverse the hexdump
+xxd -r data.txt > data_xxd_reverse
+file data_xxd_reverse
+# gzip compressed so use zcat command to decompress
+zcat data_xxd_reverse > data_zcat
+file data_zcat
+# bzip2 compressed so use bzip2 -d to decompress
+bzip2 -d data_zcat
+file data_zcat.out
+zcat data_zcat.out > data_zcat_2
+file data_zcat_2
+# tar compressed so use tar xvf command to decompress
+tar xvf data_zcat_2
+file data5.bin
+tar xvf data5.bin
+file data6.bin
+bzip2 -d data6.bin
+file data6.bin.out
+tar xvf data6.bin.out
+file data8.bin
+zcat data8.bin > data8_zcat
+file data8_zcat
+# *finally*, we get an ASCII text file
+# copy the password for L13
+exit
+
+L13->L14) We don't get the password but the private RSA key so we use that  as the localhost and log into L14. Then we get L14's passsword from within.
+
+ssh bandit13@bandit.labs.overthewire.org -p 2220
+file sshkey.private
+cat sshkey.private
+# We get the private RSA key for L14
+ssh -i sshkey.private bandit14@localhost
+# logged into L14
+cat /etc/bandit_pass/bandit14
+#copy the password for L14
+exit
+
+L14->L15) Use nc command to connect to port 30000 on localhost
+
+ssh bandit14@bandit.labs.overthewire.org -p 2220
+nc localhost 30000
+# submit the password of L14
+# copy the password for L15
+exit
+
+L15->L16) Use openssl command along with localhost port 30001
+
+ssh bandit15@bandit.labs.overthewire.org -p 2220
+openssl s_client -connect localhost:30001 -ign_eof
+# submit the password of L15
+# copy the password for L16
+exit
+
+L16->L17) Use nmap to find the appropriate port and then find one that speaks ssl. The connect using openssl.
+
+ssh bandit16@bandit.labs.overthewire.org -p 2220
+nmap -sT -A -p 31000-32000 localhost
+# we now get 5 possible ports but we need the one which speaks ssl
+# so we use the command cat /etc/bandit_pass/bandit16 | openssl s_client
+# -connect localost:<Port Number> -quiet
+# 31790 is the required port
+openssl s_client -connect localhost:31790
+# submit the password for L16
+# we receive a private RSA key which can be used to access L17
+# store this key in a new file sshkey.private
+# give read and write access only to the owner i.e. us
+chmod 400 sshkey.private 
+# now connect to L17 using this key
+ssh -i sshkey.private bandit17@localhost 
+cat /etc/bandit_pass/bandit17
+# copy password for L17
+exit
+
+L17->L18) Use diff command to find the line that differs in the new one
+
+ssh bandit17@bandit.labs.overthewire.org -p 2220
+diff passwords.new passwords.old
+# copy the password for L18
+exit
+
+L18->L19) We will log in using the bash shell instead of the bandit18 user shell to avoid being logged out
+
+ssh -t bandit18@bandit.labs.overthewire.org /bin/sh
+cat readme
+# copy the password for L19
+exit
+
+L19->L20) We will use setuid to appear as a different user
+
+ssh -t bandit19@bandit.labs.overthewire.org /bin/sh
+# run command as a different user
+./bandit20-do id
+./bandit20-do cat /etc/bandit_pass/bandit20
+# copy the password for L20
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
